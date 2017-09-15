@@ -4,5 +4,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="E:/Support/lib/sqljdbc4.jar"/>
 	<classpathentry kind="lib" path="E:/Support/lib/pdfbox-app-2.0.4.jar"/>
+	<classpathentry kind="lib" path="E:/Support/lib/java-image-scaling-0.8.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -21,6 +21,8 @@ import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 
+import com.mortennobel.imagescaling.ResampleOp;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -34,13 +36,17 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 import javax.swing.border.EtchedBorder;
 import javax.swing.JComboBox;
+import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import java.awt.Font;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.event.MouseWheelEvent;
 
 public class OperatorPage extends Thread{
 	Connection con;
@@ -92,8 +98,9 @@ public class OperatorPage extends Thread{
 	DefaultTableModel model2;
 	String filepath;
 	int inselrow,fiselrow;
-	
-	
+	double zoom = 1.0D;
+	File fna;
+	String na;
 	
 	public OperatorPage(Connection connection, String string, String string2) {
 		this.con=connection;
@@ -140,6 +147,40 @@ public class OperatorPage extends Thread{
 		frame.getContentPane().add(imgscr);
 
 		img = new JLabel();
+		img.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				fna=new File(img.getIcon().toString());
+				na="C:\\temp\\"+fna.getName();
+			}
+		});
+		img.addMouseWheelListener(new MouseWheelListener() {
+			public void mouseWheelMoved(MouseWheelEvent e) {
+				int notches = e.getWheelRotation();
+				
+		        double temp = OperatorPage.this.zoom - notches * 0.2D;
+		        temp = Math.max(temp, 1.0D);
+		        if (temp != OperatorPage.this.zoom)
+		        {
+		        	OperatorPage.this.zoom = temp;
+		          BufferedImage image = null;
+		          try
+		          {
+		       	  System.out.println("File: "+na);
+		        	  image=ImageIO.read(new File(na));
+		            ResampleOp resampleOp = new ResampleOp((int)(image.getWidth() * OperatorPage.this.zoom), (int)(image.getHeight() * OperatorPage.this.zoom));
+		            BufferedImage resizedIcon = resampleOp.filter(image, null);
+		            Icon imageIcon = new ImageIcon(resizedIcon);
+		            OperatorPage.this.img.setIcon(imageIcon);
+		          }
+		          catch (Exception e2)
+		          {
+		            System.out.println("Error: " + e2);
+		          }
+		        }
+				
+			}
+		});
 		imgscr.setViewportView(img);
 		
 		JScrollPane scrollPane = new JScrollPane();
